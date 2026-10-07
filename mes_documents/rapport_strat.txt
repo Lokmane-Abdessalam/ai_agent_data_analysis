@@ -1,0 +1,15 @@
+RAPPORT STRATÉGIQUE ET COMMERCIAL - Q3 2026
+Confidentiel - Direction Générale
+
+1. CONTEXTE MACRO-ÉCONOMIQUE ET CONCURRENCE
+Le troisième trimestre 2026 a été particulièrement tendu sur le marché européen. Notre principal concurrent, "TechDiscount", a lancé une guerre des prix agressive en août, baissant ses tarifs de 15% sur les produits phares. La Direction a pris la décision de ne pas s'aligner afin de préserver notre image de marque "Premium" et nos marges.
+
+2. ANALYSE DES PERFORMANCES PAR PAYS
+- France : Le marché français a subi un fort ralentissement. Deux facteurs qualitatifs expliquent cette chute des volumes : 
+  a) La nouvelle loi "Éco-Emballage 2026" nous a obligés à suspendre la production de 3 de nos usines pendant deux semaines en septembre pour mettre aux normes nos chaînes d'assemblage.
+  b) Une grève nationale de notre transporteur principal (LogisExpress) a entraîné un taux de retard de livraison de 45% sur le mois de septembre, provoquant de nombreuses annulations de commandes.
+- Belgique : À l'inverse, la Belgique affiche une croissance exceptionnelle due à la signature d'un partenariat exclusif de distribution avec le réseau "Bruxelles Retail".
+
+3. OBJECTIFS 2027
+- Supply Chain : Diversifier nos transporteurs. L'objectif est de ne confier que 40% maximum de nos flux à LogisExpress d'ici 2027.
+- Service Client : Déployer un agent d'IA générative pour absorber 30% des tickets de niveau 1 liés aux retards de livraison.

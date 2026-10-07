@@ -1,0 +1,13 @@
+NOTE DE SYNTHÈSE RH ET MANAGEMENT - 2026/2027
+Confidentiel - Direction des Ressources Humaines
+
+1. POLITIQUE DE RECRUTEMENT
+Face aux incertitudes économiques de la fin d'année 2026, le Comité de Direction a décidé d'un "Hiring Freeze" (gel des embauches) pour tous les recrutements externes, effectif à partir du 1er octobre 2026. 
+Les seules exceptions autorisées concernent les postes de "Data Engineers" et "Experts Cybersécurité", qui restent des profils pénuriques critiques pour notre transformation digitale.
+
+2. MOBILITÉ INTERNE ET UPSKILLING
+Pour pallier le gel des embauches externes, un budget exceptionnel de formation de 500 000 € a été débloqué. La priorité absolue est le "Upskilling" (montée en compétences) de nos équipes actuelles. 
+Tout poste vacant (départ à la retraite, démission) devra obligatoirement être proposé en mobilité interne pendant une durée de 30 jours avant toute autre démarche.
+
+3. QUALITÉ DE VIE AU TRAVAIL (QVT)
+Suite au sondage interne de juin 2026, la charte de télétravail est officiellement modifiée. Tous les employés des départements "IT" et "Support" peuvent désormais opter pour 3 jours de télétravail par semaine, contre 2 jours pour les autres départements.
