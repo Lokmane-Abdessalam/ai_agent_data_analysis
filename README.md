@@ -1,155 +1,98 @@
 # Executive AI Agent — Virtual Data Analyst
 
+An enterprise-grade, multi-agent AI system designed to act as a virtual Chief of Staff for C-level executives. This system answers complex business questions by autonomously orchestrating Text-to-SQL querying (for quantitative metrics) and Retrieval-Augmented Generation (RAG) (for qualitative strategic context), powered by LangGraph and the Groq API.
+
 ## Overview
 
-The **Executive AI Agent** is an advanced, production-ready virtual data analyst designed specifically for company leadership (C-Level, Directors, and Managers). It bridges the gap between structured business metrics and unstructured qualitative strategy by combining **Text-to-SQL data extraction** with **Retrieval-Augmented Generation (RAG)**.
+Executives rarely need just a number or just a text extract; they need a synthesis of both. This project solves that by routing queries to specialized sub-agents:
 
-When leadership asks complex business questions—such as *"What was our total revenue in France, and what qualitative factors impacted those results this quarter?"*—the system orchestrates multiple specialized tools under a single intelligent supervisor to deliver a structured "Executive Summary" combining exact figures and contextual narrative.
+* A **Sales SQL Agent** (`ventes.db`)
+* An **HR SQL Agent** (`rh.db`)
+* A **Strategic RAG Agent** (`chroma_db` via local HuggingFace embeddings)
 
-### High-Level Architecture
-
-1. **Supervisor Agent (LangGraph)**: Evaluates the executive prompt, determines which tools are needed, handles multi-step reasoning, and synthesizes the final response.
-2. **SQL Tool (LCEL + SQLite)**: Translates natural language into secure, executable SQLite queries to fetch exact quantitative KPIs (sales, revenue, volumes).
-3. **RAG Tool (ChromaDB + HuggingFace Embeddings)**: Performs semantic search across internal strategic documents (`.txt` / PDF) to retrieve qualitative context and justifications.
-4. **Interface (Streamlit)**: Provides a clean, conversational chat interface tailored for executive reporting.
-
----
+The LangGraph supervisor analyzes the user's prompt, executes the necessary tools in parallel or sequentially, and formulates a strictly structured "Executive Summary" directly in a Streamlit dashboard.
 
 ## Features
 
-* **Multi-Agent Orchestration**: Powered by LangGraph's reactive agent loop (`create_agent`), enabling sequential tool usage (SQL first, then RAG, or vice versa).
-* **Ultra-Fast LLM Inference**: Powered by the Groq API (`ChatOpenAI` connector) for near-instantaneous response times.
-* **Local Privacy & Embeddings**: Uses local HuggingFace open-source embeddings (`sentence-transformers`) for vectorizing internal documents without sending sensitive data to external embedding APIs.
-* **Executive-Ready Formatting**: Enforces strict system prompts for pyramid-structured reporting, clear separation of quantitative data vs. qualitative analysis, and elimination of technical jargon.
-
----
+* **Multi-Agent Orchestration**: Utilizes LangGraph to prevent hallucinations, strictly enforcing tool-calling boundaries (e.g., `outil_chiffres_ventes` vs `outil_ressources_humaines`).
+* **Ultra-Low Latency LLM**: Powered by LLaMA 3 via the Groq API for near-instant reasoning and generation.
+* **Local Privacy for Documents**: Uses HuggingFace `all-MiniLM-L6-v2` embeddings to vectorize sensitive corporate documents locally, keeping strategic data out of external APIs.
+* **Automated Evaluation Suite**: Includes a custom golden-dataset tester (`test_agent.py`) that uses Regex to validate exact tool-calling behavior against a markdown test book, ensuring 100% CI/CD-style reliability.
+* **Executive Dashboard**: Clean, responsive chat UI built with Streamlit.
 
 ## Tech Stack
 
 | Category | Technology | Version | Purpose |
 | --- | --- | --- | --- |
-| **Language** | Python | 3.10+ (tested on 3.14) | Core programming language |
-| **Orchestration** | LangChain / LangGraph | Latest (v1.x) | Agent loops, prompts, and LCEL chains |
-| **LLM Inference** | Groq API (`ChatOpenAI`) | Cloud API | Low-latency LLM execution |
-| **Vector Database** | ChromaDB (`langchain-chroma`) | Latest | Local storage for document embeddings |
-| **Embeddings** | HuggingFace (`sentence-transformers`) | `all-MiniLM-L6-v2` | Local text vectorization |
-| **Structured Database** | SQLite (`langchain_community.utilities`) | 3.x | Relational storage for business sales data |
-| **Web Interface** | Streamlit | Latest | Executive chat dashboard |
-| **Configuration** | python-dotenv | Latest | Secure environment variable management |
-| **Package Manager** | `uv` / `pip` | Latest | Dependency management and virtual environments |
+| **Language** | Python | 3.10+ | Core development |
+| **Orchestration** | LangChain / LangGraph | 0.3.x / 0.2.x | Multi-agent framework and routing |
+| **LLM Inference** | Groq API (`ChatOpenAI`) | Cloud | High-speed LLM reasoning |
+| **Databases** | SQLite3 | Native | Relational data (Sales & HR) |
+| **Vector Store** | ChromaDB | Latest | Local semantic document search |
+| **Embeddings** | HuggingFace | `all-MiniLM` | Text vectorization |
+| **Frontend** | Streamlit | 1.38+ | Interactive web dashboard |
 
----
-
-## Architecture Diagram
+## Architecture
 
 ```text
-               ┌──────────────────────┐
-               │    Executive (User)  │
-               └──────────┬───────────┘
-                          │
-                          ▼
-               ┌──────────────────────┐
-               │  Streamlit Dashboard │
-               └──────────┬───────────┘
-                          │
-                          ▼
-               ┌──────────────────────┐
-               │ LangGraph Supervisor │
-               └────┬────────────┬────┘
-                    │            │
-         (Quantitative)          (Qualitative)
-                    │            │
-                    ▼            ▼
-             ┌────────────┐    ┌────────────┐
-             │  SQL Tool  │    │  RAG Tool  │
-             └─────┬──────┘    └─────┬──────┘
-                   │                 │
-                   ▼                 ▼
-             ┌───────────┐     ┌───────────┐
-             │ SQLite DB │     │ ChromaDB  │
-             │ (ventes)  │     │ (vectors) │
-             └───────────┘     └───────────┘
+                             ┌──────────────────────┐
+                             │  Executive (User)    │
+                             └──────────┬───────────┘
+                                        │
+                                        ▼
+                             ┌──────────────────────┐
+                             │ Streamlit Dashboard  │
+                             └──────────┬───────────┘
+                                        │
+                                        ▼
+                             ┌──────────────────────┐
+                             │ LangGraph Supervisor │
+                             └────┬────────────┬────┘
+                                  │            │
+                 (Quantitative) ──┘            └── (Qualitative)
+                 │        │                              │
+                 ▼        ▼                              ▼
+      ┌────────────┐    ┌────────────┐            ┌────────────┐
+      │ SQL Ventes │    │   SQL RH   │            │  RAG Tool  │
+      └─────┬──────┘    └─────┬──────┘            └─────┬──────┘
+            │                 │                         │
+            ▼                 ▼                         ▼
+      ┌───────────┐     ┌───────────┐             ┌───────────┐
+      │ ventes.db │     │   rh.db   │             │ ChromaDB  │
+      └───────────┘     └───────────┘             └───────────┘
 
 ```
-
----
-
-## Project Structure
-
-```text
-ai_agent_data_analysis/
-├── README.md
-├── requirements.txt
-├── .env.example
-├── entry_point.sh
-├── agent.py
-├── rag_tool.py
-├── ingest.py
-├── supervisor.py
-├── app.py
-├── ventes.db
-├── rapport_strat.txt
-└── chroma_db/
-
-```
-
-* `agent.py`: LCEL pipeline translating natural language into SQL and querying `ventes.db`.
-* `rag_tool.py`: LangChain tool exposing ChromaDB semantic search over documents.
-* `ingest.py`: Ingestion script that parses, chunks, and embeds text reports into ChromaDB.
-* `supervisor.py`: LangGraph orchestrator integrating tools and the system prompt.
-* `app.py`: Streamlit web chat application.
-* `ventes.db`: SQLite database containing sales data.
-* `rapport_strat.txt`: Strategic company document used by the RAG pipeline.
-
----
 
 ## Prerequisites
 
-Ensure your fresh machine has the following installed:
-
-* **Operating System**: Linux, macOS, or Windows (WSL2 recommended)
-* **Python**: Version 3.10 or higher
-* **Git**: For cloning repositories
-* **Groq API Key**: Obtainable for free from [Groq Console](https://console.groq.com/)
-
----
+* Python 3.10 or higher
+* Git
+* Groq API Key (Free tier available at console.groq.com)
+* Unix-based OS (Linux/macOS) or Windows Subsystem for Linux (WSL2)
 
 ## Installation on a Fresh Machine
 
-Follow these sequential steps to set up and run the project from scratch.
+Follow these exact steps to run the complete system locally.
 
-### 1. Clone the Repository
-
+1. **Clone the repository:**
 ```bash
 git clone https://github.com/Lokmane-Abdessalam/ai_agent_data_analysis.git
 cd ai_agent_data_analysis
 
 ```
 
-### 2. Set Up Python Virtual Environment
 
+2. **Set up the Python environment:**
 ```bash
 python3 -m venv .venv
 source .venv/bin/activate
 pip install --upgrade pip
-
-```
-
-### 3. Install Dependencies
-
-Using `uv` (recommended for speed) or standard `pip`:
-
-```bash
 pip install -r requirements.txt
 
 ```
 
-*(Or via `uv pip install -r requirements.txt` if `uv` is installed).*
 
-### 4. Configure Environment Variables
-
-Create your local `.env` file from the template:
-
+3. **Configure Environment Variables:**
 ```bash
 cp .env.example .env
 
@@ -163,11 +106,13 @@ GROQ_MODEL=llama3-70b-8192
 
 ```
 
-### 5. Initialize the RAG Vector Database
-
-Run the ingestion script to parse `rapport_strat.txt` and populate ChromaDB:
-
+4. **Initialize the Mock Databases and Vector Store:**
+The project requires mock SQLite databases and a populated ChromaDB to run the tests and queries.
 ```bash
+# 1. Generate the SQLite databases (ventes.db and rh.db)
+python setup_mock_data.py
+
+# 2. Ingest the text documents into ChromaDB
 python ingest.py
 
 ```
@@ -197,20 +142,10 @@ python supervisor.py
 
 ---
 
-FILE: .env.example
-
-```env
-# Groq API Configuration
-GROQ_API_KEY=gsk_your_groq_api_key_here
-GROQ_MODEL=openai/gpt-oss-20b
-
-```
----
-
 ## Final Project Tree
 
 ```text
-virtual-data-analyst/
+ai_agent_data_analysis/
 ├── README.md
 ├── requirements.txt
 ├── .env.example
@@ -230,6 +165,8 @@ virtual-data-analyst/
 ├── mes_documents/        # Text files for RAG
 │   └── rapport_strat.txt
 └── chroma_db/            # Generated Vector DB
+
+```
 
 ---
 
