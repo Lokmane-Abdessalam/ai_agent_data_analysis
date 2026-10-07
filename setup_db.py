@@ -18,3 +18,13 @@ cursor.executemany("INSERT INTO commandes (utilisateur_id, montant, date) VALUES
 conn.commit()
 conn.close()
 print("Base de données 'ventes.db' créée avec succès !")
+
+conn = sqlite3.connect('rh.db')
+c = conn.cursor()
+c.execute('''CREATE TABLE employes (id INTEGER PRIMARY KEY, nom TEXT, departement TEXT, salaire INTEGER)''')
+c.execute("INSERT INTO employes (nom, departement, salaire) VALUES ('Alice', 'IT', 45000)")
+c.execute("INSERT INTO employes (nom, departement, salaire) VALUES ('Bob', 'Ventes', 38000)")
+c.execute("INSERT INTO employes (nom, departement, salaire) VALUES ('Charlie', 'IT', 52000)")
+conn.commit()
+conn.close()
+print("Base rh.db créée avec succès !")
