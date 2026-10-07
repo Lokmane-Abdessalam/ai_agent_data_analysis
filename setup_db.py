@@ -1,7 +1,7 @@
 import sqlite3
 
 # Crée un fichier de base de données local
-conn = sqlite3.connect('ventes.db')
+conn = sqlite3.connect("ventes.db")
 cursor = conn.cursor()
 
 # Création des tables
@@ -19,7 +19,7 @@ conn.commit()
 conn.close()
 print("Base de données 'ventes.db' créée avec succès !")
 
-conn = sqlite3.connect('rh.db')
+conn = sqlite3.connect("rh.db")
 c = conn.cursor()
 c.execute('''CREATE TABLE employes (id INTEGER PRIMARY KEY, nom TEXT, departement TEXT, salaire INTEGER)''')
 c.execute("INSERT INTO employes (nom, departement, salaire) VALUES ('Alice', 'IT', 45000)")
