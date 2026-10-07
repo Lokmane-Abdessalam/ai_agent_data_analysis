@@ -210,21 +210,26 @@ GROQ_MODEL=openai/gpt-oss-20b
 ## Final Project Tree
 
 ```text
-ai_agent_data_analysis/
+virtual-data-analyst/
 ├── README.md
 ├── requirements.txt
 ├── .env.example
-├── entry_point.sh
-├── agent.py
-├── rag_tool.py
-├── ingest.py
-├── supervisor.py
-├── app.py
-├── ventes.db
-├── rapport_strat.txt
-└── chroma_db/
-
-```
+├── .env                  # Generated manually
+├── entry_point.sh        # Startup script
+├── setup.py    # Database generator
+├── agent.py              # SQL logic for Sales
+├── agent_rh.py           # SQL logic for HR
+├── rag_tool.py           # ChromaDB search logic
+├── ingest.py             # Vector embedding script
+├── supervisor.py         # LangGraph Orchestrator
+├── app.py                # Streamlit UI
+├── test_agent.py         # Test automation script
+├── questions_de_test.md  # Golden dataset
+├── ventes.db             # Generated
+├── rh.db                 # Generated
+├── mes_documents/        # Text files for RAG
+│   └── rapport_strat.txt
+└── chroma_db/            # Generated Vector DB
 
 ---
 
@@ -238,7 +243,7 @@ source .venv/bin/activate
 pip install -r requirements.txt
 cp .env.example .env
 # Edit .env and insert your GROQ_API_KEY
-python ingest.py
-streamlit run app.py
+chmod +x entry_point.sh
+./entry_point.sh
 
 ```

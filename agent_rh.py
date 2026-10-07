@@ -1,11 +1,12 @@
 import os
 from operator import itemgetter
+
 from dotenv import load_dotenv
+from langchain_core.output_parsers import StrOutputParser
+from langchain_core.prompts import ChatPromptTemplate
+from langchain_core.runnables import RunnablePassthrough
 from langchain_community.utilities import SQLDatabase
 from langchain_openai import ChatOpenAI
-from langchain_core.prompts import ChatPromptTemplate
-from langchain_core.output_parsers import StrOutputParser
-from langchain_core.runnables import RunnablePassthrough
 
 # ============================================================
 # 1. Chargement des variables d'environnement
@@ -20,7 +21,7 @@ MODEL_NAME = os.getenv("GROQ_MODEL", "llama3-70b-8192")
 # Pour tester localement avec un fichier SQLite :
 db_rh = SQLDatabase.from_uri("sqlite:///rh.db")
 
-# Si vous avez une vraie base PostgreSQL, commentez la ligne ci-dessus 
+# Si vous avez une vraie base PostgreSQL, commentez la ligne ci-dessus
 # et décommentez celle du dessous en mettant vos identifiants :
 # db_rh = SQLDatabase.from_uri("postgresql+psycopg2://utilisateur:motdepasse@localhost:5432/base_rh")
 
@@ -40,10 +41,12 @@ llm = ChatOpenAI(
 def get_schema(_):
     return db_rh.get_table_info()
 
+
 def run_query(query: str):
     clean_query = query.replace("```sql", "").replace("```", "").strip()
     print(f" > SQL RH Exécuté : {clean_query}")
     return db_rh.run(clean_query)
+
 
 # ============================================================
 # 5. Prompts spécialisés RH
@@ -70,7 +73,7 @@ answer_prompt = ChatPromptTemplate.from_template(
 # 6. Pipeline LCEL
 # ============================================================
 generate_query_chain = (
-    {"schema": get_schema, "question": itemgetter("question")} 
+    {"schema": get_schema, "question": itemgetter("question")}
     | sql_prompt
     | llm
     | StrOutputParser()
@@ -88,12 +91,12 @@ full_chain_rh = (
 # 7. Test unitaire du module
 # ============================================================
 if __name__ == "__main__":
-    print(f"🤖 Test de l'Agent RH avec {MODEL_NAME} sur Groq...")
-    
+    print(f"Test de l'Agent RH avec {MODEL_NAME} sur Groq...")
+
     # Ce test échouera si la base rh.db n'existe pas ou est vide.
     question = "Combien avons-nous d'employés au total et quel est le salaire moyen ?"
     print(f"Question : {question}")
-    
+
     try:
         reponse = full_chain_rh.invoke({"question": question})
         print(f"\nRéponse finale : {reponse}\n")

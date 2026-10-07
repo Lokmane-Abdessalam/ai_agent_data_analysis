@@ -1,24 +1,23 @@
 import streamlit as st
-from langchain_core.messages import SystemMessage, HumanMessage, AIMessage
+from langchain_core.messages import AIMessage, HumanMessage, SystemMessage
 
 # On importe votre agent et son prompt depuis votre backend
 from supervisor import superviseur, system_prompt
 
 # 1. Configuration de la page Web
 st.set_page_config(
-    page_title="Executive AI - Direction", 
-    page_icon="👔", 
-    layout="centered"
+    page_title="Executive AI - Direction",
+    layout="centered",
 )
 
-st.title("👔 Assistant Stratégique de Direction")
+st.title("Assistant Stratégique de Direction")
 st.markdown("Interrogez vos bases de ventes et vos rapports stratégiques en langage naturel.")
 
 # 2. Initialisation de la mémoire de l'Agent (Session State)
 if "messages_agent" not in st.session_state:
     # L'agent a toujours besoin de son SystemPrompt en premier
     st.session_state.messages_agent = [SystemMessage(content=system_prompt)]
-    
+
 # 3. Initialisation de l'historique visuel (Ce que l'utilisateur voit)
 if "messages_ui" not in st.session_state:
     st.session_state.messages_ui = [
@@ -32,11 +31,11 @@ for msg in st.session_state.messages_ui:
 
 # 5. Barre de saisie utilisateur
 if prompt := st.chat_input("Ex: Quel est le CA en France et pourquoi a-t-il baissé ?"):
-    
+
     # A. On affiche immédiatement la question à l'écran
     st.chat_message("user").markdown(prompt)
     st.session_state.messages_ui.append({"role": "user", "content": prompt})
-    
+
     # B. On l'ajoute à la mémoire technique de l'agent
     st.session_state.messages_agent.append(HumanMessage(content=prompt))
 
@@ -46,16 +45,16 @@ if prompt := st.chat_input("Ex: Quel est le CA en France et pourquoi a-t-il bais
             try:
                 # Appel de votre agent LangGraph
                 resultat = superviseur.invoke({"messages": st.session_state.messages_agent})
-                
+
                 # Extraction de la réponse finale
                 reponse_ia = resultat["messages"][-1].content
-                
+
                 # Affichage à l'écran
                 st.markdown(reponse_ia)
-                
+
                 # Sauvegarde dans les historiques
                 st.session_state.messages_ui.append({"role": "assistant", "content": reponse_ia})
                 st.session_state.messages_agent.append(AIMessage(content=reponse_ia))
-                
+
             except Exception as e:
                 st.error(f"Une erreur technique est survenue : {e}")

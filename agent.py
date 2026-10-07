@@ -1,16 +1,17 @@
 import os
 from operator import itemgetter
+
 from dotenv import load_dotenv
+from langchain_core.output_parsers import StrOutputParser
+from langchain_core.prompts import ChatPromptTemplate
+from langchain_core.runnables import RunnablePassthrough
 from langchain_community.utilities import SQLDatabase
 from langchain_openai import ChatOpenAI
-from langchain_core.prompts import ChatPromptTemplate
-from langchain_core.output_parsers import StrOutputParser
-from langchain_core.runnables import RunnablePassthrough
 
 # 1. Chargement des variables d'environnement
 load_dotenv(".env", override=True)
 GROQ_API_KEY = os.getenv("GROQ_API_KEY")
-MODEL_NAME = os.getenv("GROQ_MODEL", "llama3-70b-8192") # Modèle par défaut suggéré pour le code
+MODEL_NAME = os.getenv("GROQ_MODEL", "llama3-70b-8192")  # Modèle par défaut suggéré pour le code
 
 # 2. Base de données et LLM
 db = SQLDatabase.from_uri("sqlite:///ventes.db")
@@ -26,10 +27,12 @@ llm = ChatOpenAI(
 def get_schema(_):
     return db.get_table_info()
 
+
 def run_query(query: str):
     clean_query = query.replace("```sql", "").replace("```", "").strip()
     print(f" > SQL Exécuté : {clean_query}")
     return db.run(clean_query)
+
 
 # 4. Prompts
 sql_prompt = ChatPromptTemplate.from_template(
@@ -51,7 +54,7 @@ answer_prompt = ChatPromptTemplate.from_template(
 
 # 5. Pipeline LCEL
 generate_query_chain = (
-    {"schema": get_schema, "question": itemgetter("question")} 
+    {"schema": get_schema, "question": itemgetter("question")}
     | sql_prompt
     | llm
     | StrOutputParser()
@@ -66,6 +69,8 @@ full_chain = (
 )
 
 if __name__ == "__main__":
-    print(f"🤖 Test de l'Agent SQL avec {MODEL_NAME} sur Groq...")
-    reponse = full_chain.invoke({"question": "Quel est le montant total des commandes passées par des clients en France ?"})
+    print(f"Test de l'Agent SQL avec {MODEL_NAME} sur Groq...")
+    reponse = full_chain.invoke(
+        {"question": "Quel est le montant total des commandes passées par des clients en France ?"}
+    )
     print(f"\nRéponse finale : {reponse}\n")
